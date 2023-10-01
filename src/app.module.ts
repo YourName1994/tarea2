@@ -7,6 +7,7 @@ import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from './config/co
 import { UsersModule } from './users/users.module';
 import { DogsModule } from './dogs/dogs.module';
 import { AuthModule } from './auth/auth.module';
+import { BreedsModule } from './breeds/breeds.module';
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ TypeOrmModule.forRootAsync({
 }),
  UsersModule,
  DogsModule,
- AuthModule
+ AuthModule,
+ BreedsModule
   ],
   controllers: [AppController],
   providers: [AppService],
