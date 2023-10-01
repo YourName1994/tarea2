@@ -6,8 +6,8 @@ export class Breed {
     @Column({primary: true, generated: true})
     id: number;
     @Column()
-    name: String;
-    @OneToMany(()=>Dog,(dog)=>dog.id)
+    name: string;
+    @OneToMany(()=>Dog,(dog)=>dog.breed)
     dogs: Dog[];
 
 }
