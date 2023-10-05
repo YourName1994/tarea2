@@ -1,3 +1,4 @@
+import { IsOptional } from "class-validator";
 import { Dog } from "src/dogs/entities/dog.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 @Entity()

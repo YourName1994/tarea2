@@ -20,10 +20,11 @@ export class DogsService {
     //const dog = this.catRepository.create(createDogDto);
     //return await this.catRepository.save(createDogDto);
     const breed = await this.breedRepository.findOneBy({name: createDogDto.breed});
+    //console.log(breed);
     if(!breed){
       throw new BadRequestException('Breed not found');
     }
-    return await this.dogRepository.save({...CreateDogDto,breed});
+    return await this.dogRepository.save({...createDogDto,breed});
   }
 
   async findAll() {
