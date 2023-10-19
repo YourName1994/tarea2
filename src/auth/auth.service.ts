@@ -16,7 +16,7 @@ export class AuthService {
         private readonly jwtService: JwtService
         ){}
     
-    async register({name, email, password}: RegisterDto){
+    async register({name, email, password, role}: RegisterDto){
         const user = await this.usersService.findOneByEmail(email);
         if (user){
             throw new BadRequestException('User already exists');
@@ -25,13 +25,18 @@ export class AuthService {
             name, 
             email, 
             password: await bcryptjs.hash(password,10),
+            role,
         });
+        return {
+            name,
+            email,
+        }
     }
 
     
     async login({email, password}: LoginDto){
 
-        const user = await this.usersService.findOneByEmail(email);
+        const user = await this.usersService.findByEmailWhistPassword(email);
         if (!user){
             throw new UnauthorizedException('email is wrong');
         }
@@ -40,7 +45,7 @@ export class AuthService {
             throw new UnauthorizedException('password is wrong');
         }
 
-        const payload = {email: user.email};
+        const payload = {email: user.email, role: user.role};
 
         const token = await this.jwtService.signAsync(payload);
 
@@ -50,4 +55,10 @@ export class AuthService {
         };
     }
 
+    async profile({email,role}: {email:string, role: string}){
+        if(role!== 'admin'){
+            throw new UnauthorizedException('you are not authorised');
+        }
+        return await this.usersService.findOneByEmail(email);
+    }
 }

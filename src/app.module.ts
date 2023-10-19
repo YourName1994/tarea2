@@ -34,11 +34,11 @@ TypeOrmModule.forRootAsync({
 TypeOrmModule.forRootAsync({
   useFactory: () => ({
     type: 'mysql',
-    host: 'localhost',
-    port: 3307,
-    username: 'user_crud',
-    password: 'root',
-    database: 'db_crud',
+    host: process.env.POSTGRES_HOST,
+    port: parseInt(process.env.SERVER_PORT2),
+    username: process.env.POSTGRES_USERNAME,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DATABASE,
     autoLoadEntities: true,
     synchronize: true,
   }),

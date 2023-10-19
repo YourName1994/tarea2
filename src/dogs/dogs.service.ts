@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateDogDto } from './dto/create-dog.dto';
 import { UpdateDogDto } from './dto/update-dog.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Dog } from './entities/dog.entity';
 import { Repository } from 'typeorm';
-import { Breed } from 'src/breeds/entities/breed.entity';
+import { Breed } from '../breeds/entities/breed.entity';
+import { UserActiveInterface } from '../common/interfaces/user-active.enterface';
+import { Role } from 'src/common/enums/rol.enum';
 
 @Injectable()
 export class DogsService {
@@ -16,31 +18,57 @@ export class DogsService {
     private readonly breedRepository: Repository<Breed>,
     ){}
   
-  async create(createDogDto: CreateDogDto) {
-    //const dog = this.catRepository.create(createDogDto);
-    //return await this.catRepository.save(createDogDto);
-    const breed = await this.breedRepository.findOneBy({name: createDogDto.breed});
-    //console.log(breed);
-    if(!breed){
-      throw new BadRequestException('Breed not found');
+  async create(createDogDto: CreateDogDto, user: UserActiveInterface) {
+    const breed = await this.validateBreed(createDogDto.breed);
+    return await this.dogRepository.save({...createDogDto,breed: breed, userEmail: user.email
+    });
+  }
+
+  async findAll(user: UserActiveInterface) {
+    if(user.role === Role.ADMIN){
+      return await this.dogRepository.find();
     }
-    return await this.dogRepository.save({...createDogDto,breed});
+    return await this.dogRepository.find(
+      {where: {userEmail: user.email}}
+    );
   }
 
-  async findAll() {
-    return await this.dogRepository.find();
+  async findOne(id: number,user: UserActiveInterface) {
+    
+    const dog = await this.dogRepository.findOneBy({id});
+    if(!dog){
+      throw new BadRequestException('Cat not found');
+    }
+    this.validateOwership(dog,user);
+    return dog;
   }
 
-  async findOne(id: number) {
-    return await this.dogRepository.findOneBy({id});
-  }
-
-  async update(id: number, updateDogDto: UpdateDogDto) {
+  async update(id: number, updateDogDto: UpdateDogDto,user: UserActiveInterface) {
     //return await this.catRepository.update(id,updateDogDto);
-    return;
+    await this.findOne(id,user);
+    const bredValidator= await this.validateBreed(updateDogDto.breed);
+    return await this.dogRepository.update(id,{...updateDogDto,
+       breed: updateDogDto.breed ? bredValidator : undefined,
+       userEmail: user.email});
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: UserActiveInterface) {
+    await this.findOne(id,user);
     return await this.dogRepository.softDelete({id});
   }
+
+  private validateOwership(dog: Dog, user: UserActiveInterface){
+    if(user.role !== Role.ADMIN && dog.userEmail !== user.email){
+      throw new UnauthorizedException();
+    }
+  }
+
+  private async validateBreed(breed: string){
+    const breedEntity = await this.breedRepository.findOneBy({name: breed});
+    if(!breedEntity){
+      throw new BadRequestException('Breed not found');
+    }
+    return breedEntity;
+  }
+
 }

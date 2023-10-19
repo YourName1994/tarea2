@@ -3,7 +3,7 @@ import { CreateDogDto } from './create-dog.dto';
 import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateDogDto extends PartialType(CreateDogDto) {
-
+/*
     @IsString()
     @MinLength(1)
     @IsOptional()
@@ -14,4 +14,5 @@ export class UpdateDogDto extends PartialType(CreateDogDto) {
     @IsString()
     @IsOptional()
     breed?: string;
+    */
 }
