@@ -41,6 +41,10 @@ TypeOrmModule.forRootAsync({
     database: process.env.POSTGRES_DATABASE,
     autoLoadEntities: true,
     synchronize: true,
+    extra: {
+      ssl: 
+        process.env.POSTGRES_SSL === 'true'?{rejectUnauthorized: false,}: null
+    }
   }),
 }),
  UsersModule,
