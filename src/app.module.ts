@@ -33,7 +33,7 @@ TypeOrmModule.forRootAsync({
   */  
 TypeOrmModule.forRootAsync({
   useFactory: () => ({
-    type: 'mysql',
+    type: 'postgres',
     host: process.env.POSTGRES_HOST,
     port: parseInt(process.env.SERVER_PORT2),
     username: process.env.POSTGRES_USERNAME,
